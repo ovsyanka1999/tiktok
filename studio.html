@@ -125,7 +125,28 @@ button.main{background:linear-gradient(90deg,#8a6b3a,#b79255);color:#14110a;widt
   <div><label>Листья</label><input type="color" data-w="P" data-k="leaf"></div>
   <div><label>Горшок</label><input type="color" data-w="P" data-k="pot"></div>
 </div>
-<button class="main" onclick="send('P')">Применить на эфире</button>
+<h2>Дополнительно: рост от подарков TikTok LIVE</h2>
+<p class="hint">Подарки обрабатываются через уже используемое подключение TikFinity. Для работы оставьте пульт открытым и нажмите «Подключить TikFinity». Правила сохраняются отдельно от обычного роста по времени.</p>
+<label class="chk"><input type="checkbox" data-w="P" data-k="giftEnabled"> Включить рост от подарков</label>
+<label>Правило начисления</label>
+<select data-w="P" data-k="giftMode">
+  <option value="selected">Только выбранные подарки</option>
+  <option value="coins">За накопленные монеты</option>
+  <option value="both">Подарки и накопленные монеты</option>
+</select>
+<label>Выбранные подарки (по одному правилу на строку: название=процент роста)</label>
+<textarea data-w="P" data-k="giftRulesText" placeholder="Rose=1
+Heart Me=3
+Galaxy=20"></textarea>
+<p class="hint">Название должно совпадать с названием подарка в событии TikFinity. Процент начисляется за один подарок; для нескольких подарков в одном событии учитывается количество.</p>
+<div class="row">
+  <div><label>Порог накопленных монет</label><input type="number" min="1" data-w="P" data-k="giftCoinThreshold"></div>
+  <div><label>Рост за порог, %</label><input type="number" min="0" step="0.1" data-w="P" data-k="giftCoinGrowth"></div>
+</div>
+<p class="hint">Пример: порог 100 монет и рост 5% — каждые накопленные 100 монет дают +5% роста. Остаток монет сохраняется до достижения следующего порога.</p>
+<label class="chk"><input type="checkbox" data-w="P" data-k="giftResetCoins"> Обнулять накопленные монеты при «Старт с нуля»</label>
+<div class="box"><b>Статус подарков:</b> <span id="giftStatus">Ожидает подключения к TikFinity</span><br><b>Накоплено монет:</b> <span id="giftCoins">0</span></div>
+<button class="main" onclick="send('P')">Сохранить настройки растения и подарков</button>
 <div class="btns">
   <button onclick="plantCmd('start')">Старт с нуля</button>
   <button onclick="plantCmd('pause')">Пауза</button>
@@ -147,7 +168,8 @@ const D = {
      itemsText:"tiktok @ovsyanka.team\ninstagram @ovsyanka.team\ntelegram @ovsyanka_team"}
 };
 D.P = {title:"Спатифиллум", subtitle:"Sensation", infoLabel:"Растём", doneText:"Расцвело ✿", leaves:9, flowers:3,
-  stepSec:180, unfurlSec:40, gold:"#b79255", leaf:"#3e6b45", pot:"#c9b08a", showPlaque:true, showInfo:true, visible:true};
+  stepSec:180, unfurlSec:40, gold:"#b79255", leaf:"#3e6b45", pot:"#c9b08a", showPlaque:true, showInfo:true, visible:true,
+  giftEnabled:false, giftMode:"selected", giftRulesText:"Rose=1\nHeart Me=3\nGalaxy=20", giftCoinThreshold:100, giftCoinGrowth:5, giftResetCoins:true};
 const SUF = {L:"-lk", S:"-so", P:"-pl"};
 const $ = id => document.getElementById(id);
 const q = new URLSearchParams(location.search);
@@ -173,6 +195,17 @@ function read(w){
     const k = el.dataset.k;
     st[w][k] = el.type === "checkbox" ? el.checked : el.type === "number" ? (Number(el.value) || 0) : el.value;
   });
+  if (w === "P") {
+    st.P.giftRules = String(st.P.giftRulesText || "").split("\n").map(line => line.trim()).filter(Boolean).map(line => {
+      const i = line.lastIndexOf("=");
+      if (i < 1) return null;
+      const name = line.slice(0, i).trim();
+      const growth = Number(line.slice(i + 1).trim());
+      return name && Number.isFinite(growth) && growth >= 0 ? { name, growth } : null;
+    }).filter(Boolean);
+    st.P.giftCoinThreshold = Math.max(1, Number(st.P.giftCoinThreshold) || 100);
+    st.P.giftCoinGrowth = Math.max(0, Number(st.P.giftCoinGrowth) || 0);
+  }
   if (w === "S") st.S.items = st.S.itemsText.split("\n").map(x => x.trim()).filter(Boolean).map(l => {
     const [p, ...r] = l.split(/\s+/); const known = ["tiktok","instagram","youtube","telegram","x","discord"].includes(p.toLowerCase());
     return known && r.length ? { p:p.toLowerCase(), h:r.join(" ") } : { p:"link", h:l };
@@ -200,21 +233,66 @@ function copy(id){ navigator.clipboard.writeText($(id).textContent).then(() => s
 
 /* Мост TikFinity -> виджет (передача раз в 5 секунд, если лайки изменились) */
 let bws, btotal = 0, dirty = false, started = false;
+let giftCoinBank = Number(localStorage.getItem("tw_gift_coins_" + T)) || 0;
+const giftSeen = new Set(JSON.parse(localStorage.getItem("tw_gift_seen_" + T) || "[]"));
+function updateGiftStatus(text){ const e = $("giftStatus"); if (e) e.textContent = text; const c = $("giftCoins"); if (c) c.textContent = String(giftCoinBank); }
 function bridge(){
   if (started) return; started = true; connect();
   setInterval(() => { if (dirty){ dirty = false; post("-lv", { total:btotal }).catch(() => { dirty = true; }); } }, 5000);
 }
+function giftEventId(d, raw){
+  return String(d.eventId || d.msgId || d.messageId || d.id || raw.eventId || raw.msgId || raw.id || "").trim();
+}
+function handleGiftEvent(d, raw){
+  const cfg = Object.assign({}, D.P, st.P);
+  if (!cfg.giftEnabled) return;
+  const giftName = String(d.giftName || d.name || d.gift_name || d.gift || "").trim();
+  const count = Math.max(1, Number(d.repeatCount || d.giftCount || d.count || 1));
+  const unitCoins = Number(d.diamondCount ?? d.coins ?? d.coinValue ?? d.giftValue ?? 0);
+  const explicitTotal = Number(d.totalCoins ?? d.totalDiamondCount ?? 0);
+  const totalCoins = explicitTotal > 0 ? explicitTotal : Math.max(0, unitCoins * count);
+  if (!giftName && totalCoins <= 0) return;
+  // Prefer provider event IDs; use a short-lived fingerprint only when no ID is supplied.
+  const id = giftEventId(d, raw) || [d.userId || d.uniqueId || d.nickname || "viewer", giftName, count, totalCoins, Math.floor(Date.now()/1500)].join("|");
+  if (giftSeen.has(id)) return;
+  giftSeen.add(id); localStorage.setItem("tw_gift_seen_" + T, JSON.stringify([...giftSeen].slice(-300)));
+  let growth = 0;
+  if (cfg.giftMode === "selected" || cfg.giftMode === "both") {
+    const rule = (cfg.giftRules || []).find(r => String(r.name).trim().toLocaleLowerCase() === giftName.toLocaleLowerCase());
+    if (rule) growth += Math.max(0, Number(rule.growth) || 0) * count;
+  }
+  if ((cfg.giftMode === "coins" || cfg.giftMode === "both") && totalCoins > 0) {
+    giftCoinBank += totalCoins;
+    const threshold = Math.max(1, Number(cfg.giftCoinThreshold) || 100);
+    const reached = Math.floor(giftCoinBank / threshold);
+    if (reached > 0) { growth += reached * Math.max(0, Number(cfg.giftCoinGrowth) || 0); giftCoinBank -= reached * threshold; }
+    localStorage.setItem("tw_gift_coins_" + T, String(giftCoinBank));
+  }
+  updateGiftStatus(growth > 0 ? `Подарок «${giftName || "подарок"}»: +${growth}%` : `Получен подарок «${giftName || "без названия"}»; правило не сработало`);
+  if (growth > 0) {
+    const p = Object.assign({}, D.P, st.P);
+    const leaves = Math.max(1, Math.min(10, Number(p.leaves) || 9));
+    const flowers = Math.max(0, Math.min(4, Number(p.flowers) || 0));
+    const step = Math.max(1, Number(p.stepSec) || 180) * 1000;
+    const unfurl = Math.max(1, Number(p.unfurlSec) || 40) * 1000;
+    const fullMs = ((leaves + flowers - 1) * step) + unfurl * (flowers ? 1.4 : 1);
+    const ms = Math.round(fullMs * growth / 100);
+    post("-plc", { type:"giftGrowth", ms, giftName, growth }).catch(() => updateGiftStatus("Подарок обработан, но не удалось отправить рост виджету"));
+  }
+}
 function connect(){
   try {
     bws = new WebSocket("ws://127.0.0.1:21213/");
-    bws.onopen = () => $("bstat").textContent = "Подключено к TikFinity ✓ Ждём лайки из эфира";
+    bws.onopen = () => { $("bstat").textContent = "Подключено к TikFinity ✓ Ждём события эфира"; updateGiftStatus("Подключено; ожидаем подарки"); };
     bws.onmessage = e => { try {
       const m = JSON.parse(e.data);
       if (m.event === "like"){ const d = m.data || {};
         if (typeof d.totalLikeCount === "number") btotal = d.totalLikeCount; else btotal += d.likeCount || 0;
-        $("btotal").textContent = btotal; dirty = true; }
+        $("btotal").textContent = btotal; dirty = true;
+      }
+      if (String(m.event || "").toLowerCase() === "gift") handleGiftEvent(m.data || {}, m);
     } catch(_){} };
-    bws.onclose = () => { $("bstat").textContent = "Нет связи с TikFinity. Он запущен на этом ПК? Повтор через 5 с"; setTimeout(connect, 5000); };
+    bws.onclose = () => { $("bstat").textContent = "Нет связи с TikFinity. Он запущен на этом ПК? Повтор через 5 с"; updateGiftStatus("Нет связи с TikFinity"); setTimeout(connect, 5000); };
     bws.onerror = () => bws.close();
   } catch (e) { $("bstat").textContent = "Браузер не дал подключиться: " + e.message; setTimeout(connect, 5000); }
 }
@@ -235,12 +313,14 @@ function calcStep(){
 }
 async function plantCmd(type){
   const ms = type === "skip" ? Math.max(1, pv("stepSec")) * 1000 : 0;
+  if (type === "start" && st.P.giftResetCoins) { giftCoinBank = 0; localStorage.setItem("tw_gift_coins_" + T, "0"); updateGiftStatus("Новый эфир: накопленные монеты обнулены"); }
   const names = {start:"запущено с нуля", pause:"пауза", resume:"продолжает расти", reset:"сброшено", skip:"+1 шаг", full:"показано готовое растение"};
   try { await post("-plc", { type, ms }); status("Растение: " + names[type] + " ✓"); }
   catch (e) { status("Не отправилось (" + e.message + "). Подождите пару секунд и повторите.", false); }
 }
 document.querySelectorAll('[data-w="P"]').forEach(e => e.addEventListener("input", plTotal));
 plTotal();
+updateGiftStatus("Ожидает подключения к TikFinity");
 </script>
 </body>
 </html>

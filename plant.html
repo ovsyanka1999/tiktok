@@ -168,6 +168,7 @@ function fold(m){
   else if (c.type === "resume"){ if (!S.running){ S.running = true; S.since = t; } }
   else if (c.type === "reset") S = {base:0, running:false, since:0};
   else if (c.type === "skip") S.base += c.ms || 0;
+  else if (c.type === "giftGrowth") { S.base += Math.max(0, Number(c.ms) || 0); if (Date.now() - t < 8000) pendingSparks = Math.min(60, 12 + Math.floor((Number(c.growth) || 0) / 2)); }
   else if (c.type === "full"){ S = {base:1e12, running:false, since:0}; if (Date.now() - t < 8000) pendingSparks = 40; }
   localStorage.setItem("pl_state", JSON.stringify(S));
 }
