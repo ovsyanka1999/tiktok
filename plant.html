@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plant widget</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#b79255;--leaf:#3e6b45;--pot:#c9b08a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-family:'Cormorant Garamond',Georgia,serif;color:#efe6d2}
+.wrap{height:100%;display:flex;align-items:flex-end;justify-content:center;padding:10px}
+.pop{width:min(100%,520px);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;transition:transform 1s cubic-bezier(.2,1.2,.3,1),opacity .7s}
+.pop.hide{transform:translateY(60px) scale(.9);opacity:0}
+.stage{position:relative;flex:1;min-height:0;width:100%}
+.stage svg{width:100%;height:100%;overflow:visible}
+.fl{filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+.plaque{width:min(100%,340px)}
+.frame{padding:1px;border-radius:6px;background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 80%,#fff) 0%,color-mix(in srgb,var(--gold) 55%,#000) 55%,color-mix(in srgb,var(--gold) 70%,#000) 100%);box-shadow:0 22px 50px rgba(0,0,0,.5),0 2px 0 rgba(0,0,0,.25)}
+.card{position:relative;border-radius:5px;padding:12px 20px 12px;text-align:center;background:linear-gradient(160deg,rgba(24,34,26,.90),rgba(14,18,15,.93))}
+.card::before{content:"";position:absolute;inset:5px;border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:2px;pointer-events:none}
+.metal{background:linear-gradient(180deg,#f6efdc 0%,#e8dcc0 55%,#d3c29b 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+.title{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:24px;letter-spacing:.26em;padding-left:.26em;text-transform:uppercase;margin:0;white-space:nowrap}
+.subt{font-style:italic;font-size:19px;margin:0;color:#d9ccae}
+.info{margin-top:6px;font-size:18px;font-weight:600;color:var(--gold)}
+.mote{position:absolute;border-radius:50%;background:#f1dfb4;box-shadow:0 0 5px rgba(241,223,180,.55);pointer-events:none;animation:mote linear forwards}
+@keyframes mote{0%{opacity:0;transform:translate(0,0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),-150px)}}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(90% 70% at 85% 0%,rgba(255,236,196,.07),transparent 60%)}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="pop hide" id="pop">
+  <div class="stage" id="stage">
+   <svg viewBox="0 0 460 580" preserveAspectRatio="xMidYMax meet">
+    <defs>
+     <linearGradient id="lg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" style="stop-color:color-mix(in srgb,var(--leaf) 55%,#000)"/><stop offset=".5" style="stop-color:color-mix(in srgb,var(--leaf) 80%,#fff)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--leaf) 62%,#000)"/></linearGradient>
+     <linearGradient id="pg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" style="stop-color:color-mix(in srgb,var(--pot) 78%,#000)"/><stop offset=".45" style="stop-color:var(--pot)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--pot) 72%,#000)"/></linearGradient>
+     <linearGradient id="gg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--gold) 55%,#fff)"/><stop offset=".5" style="stop-color:var(--gold)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--gold) 60%,#000)"/></linearGradient>
+     <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3ead3"/><stop offset="1" stop-color="#cfd1b0"/></linearGradient>
+     <linearGradient id="dg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#b79255"/><stop offset=".5" stop-color="#d8c18a"/><stop offset="1" stop-color="#9c7c47"/></linearGradient>
+    </defs>
+    <ellipse cx="230" cy="568" rx="112" ry="7" fill="rgba(0,0,0,.35)"/>
+    <ellipse cx="230" cy="446" rx="96" ry="10" fill="#241a12"/>
+    <g id="plant"></g>
+    <path d="M142 466 L318 466 L302 550 Q300 562 286 562 L174 562 Q160 562 158 550 Z" fill="url(#pg)"/>
+    <rect x="152" y="508" width="156" height="4" rx="2" fill="url(#gg)" opacity=".85"/>
+    <rect x="130" y="446" width="200" height="24" rx="12" fill="url(#gg)"/>
+    <rect x="136" y="449" width="188" height="5" rx="2.5" fill="rgba(255,244,214,.28)"/>
+   </svg>
+  </div>
+  <div class="plaque" id="plaque"><div class="frame"><div class="card">
+   <h1 class="title metal" id="title"></h1>
+   <p class="subt" id="subt"></p>
+   <div class="info" id="info"></div>
+  </div></div></div>
+ </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const T = new URLSearchParams(location.search).get("t");
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), ease = g => 1 - Math.pow(1 - g, 3);
+const CX = 230, BASE = 446;
+const DEF = {title:"Спатифиллум", subtitle:"Sensation", infoLabel:"Растём", doneText:"Расцвело ✿", leaves:9, flowers:3,
+  stepSec:180, unfurlSec:40, gold:"#b79255", leaf:"#3e6b45", pot:"#c9b08a", showPlaque:true, showInfo:true, visible:true};
+const LEAVES = [
+  {a:-4,L1:105,B:170,W:40,bend:-2},{a:24,L1:95,B:165,W:40,bend:7},{a:-32,L1:92,B:160,W:38,bend:-9},
+  {a:46,L1:80,B:150,W:37,bend:12},{a:-52,L1:78,B:150,W:37,bend:-14},{a:10,L1:122,B:182,W:44,bend:3},
+  {a:-18,L1:112,B:176,W:42,bend:-5},{a:64,L1:68,B:132,W:34,bend:18},{a:-68,L1:66,B:132,W:34,bend:-20},
+  {a:34,L1:104,B:168,W:40,bend:8}];
+const FLOWERS = [{a:-14,L:292},{a:15,L:268},{a:2,L:326},{a:-30,L:236}];
+
+let cfg = Object.assign({}, DEF, JSON.parse(localStorage.getItem("pl_cfg") || "{}"));
+let S = Object.assign({base:0, running:false, since:0}, JSON.parse(localStorage.getItem("pl_state") || "{}"));
+const seen = new Set(JSON.parse(localStorage.getItem("pl_seen") || "[]"));
+if (!seen.size) S = {base:0, running:false, since:0};
+let leafEls = [], flowerEls = [], bsig = "", nL = 0, nF = 0, prevStep = null, lastTxt = "", pendingSparks = 0;
+
+function leafSVG(i, o){
+  const L1 = o.L1, B = o.B, W = o.W, y0 = -L1; let v = "";
+  for (let k = 1; k <= 6; k++){
+    const t = k / 7, ym = y0 - B * t, s = Math.pow(Math.sin(Math.PI * t), .7) * W * .8;
+    v += `M0 ${ym} Q ${s*.5} ${ym-B*.03} ${s} ${ym-B*.11} M0 ${ym} Q ${-s*.5} ${ym-B*.03} ${-s} ${ym-B*.11} `;
+  }
+  return `<g data-leaf="${i}" display="none"><path d="M0 0 C 3 ${-L1*.35} -3 ${-L1*.7} 0 ${y0}" stroke="#2f4f35" stroke-width="5" fill="none" stroke-linecap="round"/>` +
+   `<g transform="rotate(${o.bend} 0 ${y0})"><path d="M0 ${y0} C ${-W} ${y0-B*.18} ${-W*.9} ${y0-B*.78} 0 ${y0-B} C ${W*.9} ${y0-B*.78} ${W} ${y0-B*.18} 0 ${y0} Z" fill="url(#lg)" stroke="rgba(10,40,20,.7)" stroke-width="1"/>` +
+   `<path d="M0 ${y0} L0 ${y0-B*.97}" stroke="rgba(214,226,180,.45)" stroke-width="1.6" fill="none"/><path d="${v}" stroke="rgba(214,226,180,.22)" stroke-width="1" fill="none"/>` +
+   `<path d="M${-W*.5} ${y0-B*.32} C ${-W*.48} ${y0-B*.55} ${-W*.3} ${y0-B*.8} -2 ${y0-B*.93}" stroke="rgba(255,255,255,.16)" stroke-width="4" fill="none" stroke-linecap="round"/></g></g>`;
+}
+function flowerSVG(j, o){
+  const L = o.L;
+  return `<g data-fl="${j}" class="fl" display="none"><path data-st d="M0 0 C 2 ${-L*.4} -2 ${-L*.75} 0 ${-L}" stroke="#456b46" stroke-width="4" fill="none" stroke-linecap="round"/>` +
+   `<g data-sp><path d="M0 0 C -30 -6 -34 -56 0 -98 C 34 -56 30 -6 0 0 Z" fill="url(#sg)" stroke="rgba(110,160,115,.5)" stroke-width="1"/><path d="M0 -4 L0 -78" stroke="rgba(130,175,130,.5)" stroke-width="1.2" fill="none"/><rect x="-5" y="-54" width="10" height="44" rx="5" fill="url(#dg)"/></g></g>`;
+}
+function build(){
+  const s = cfg.leaves + "," + cfg.flowers; if (s === bsig) return; bsig = s;
+  nL = cfg.leaves; nF = cfg.flowers;
+  const root = $("plant"); root.innerHTML = ""; leafEls = []; flowerEls = [];
+  let html = "";
+  for (let j = 0; j < nF; j++) html += flowerSVG(j, FLOWERS[j]);
+  LEAVES.slice(0, nL).map((o, i) => ({o, i})).sort((x, y) => Math.abs(y.o.a) - Math.abs(x.o.a)).forEach(x => html += leafSVG(x.i, x.o));
+  root.insertAdjacentHTML("beforeend", html);
+  for (let i = 0; i < nL; i++) leafEls[i] = { g: root.querySelector(`[data-leaf="${i}"]`), a: LEAVES[i].a };
+  for (let j = 0; j < nF; j++){
+    const g = root.querySelector(`[data-fl="${j}"]`);
+    flowerEls[j] = { g, st: g.querySelector("[data-st]"), sp: g.querySelector("[data-sp]"), a: FLOWERS[j].a, L: FLOWERS[j].L };
+  }
+  prevStep = null;
+}
+function apply(c){
+  cfg = Object.assign({}, DEF, c);
+  cfg.leaves = clamp(Math.round(cfg.leaves) || 1, 1, 10); cfg.flowers = clamp(Math.round(cfg.flowers) || 0, 0, 4);
+  localStorage.setItem("pl_cfg", JSON.stringify(cfg));
+  const r = document.documentElement.style; r.setProperty("--gold", cfg.gold); r.setProperty("--leaf", cfg.leaf); r.setProperty("--pot", cfg.pot);
+  $("title").textContent = cfg.title; $("subt").textContent = cfg.subtitle;
+  $("plaque").style.display = cfg.showPlaque ? "" : "none";
+  $("info").style.display = cfg.showInfo ? "" : "none";
+  $("pop").classList.toggle("hide", !cfg.visible);
+  build(); lastTxt = "";
+}
+function sparks(n){
+  for (let i = 0; i < n; i++){
+    const m = document.createElement("span"), z = 3 + Math.random() * 5;
+    m.className = "mote";
+    m.style.cssText = `left:${25+Math.random()*50}%;bottom:${12+Math.random()*55}%;width:${z}px;height:${z}px;--dx:${(Math.random()-.5)*70}px;animation-duration:${2.5+Math.random()*2}s`;
+    $("stage").appendChild(m); setTimeout(() => m.remove(), 5000);
+  }
+}
+function frame(){
+  const now = Date.now(), el = S.base + (S.running ? now - S.since : 0);
+  const sm = Math.max(1, cfg.stepSec) * 1000, um = Math.max(1, cfg.unfurlSec) * 1000;
+  leafEls.forEach((o, i) => {
+    const g = clamp((el - i * sm) / um), e = ease(g);
+    if (g <= 0){ o.g.setAttribute("display", "none"); return; }
+    o.g.removeAttribute("display");
+    const sway = Math.sin(now / 1400 + i * 1.7) * 1.3 * e;
+    o.g.setAttribute("transform", `translate(${CX + o.a * .22} ${BASE}) rotate(${o.a * (.45 + .55 * e) + sway}) scale(${.25 + .75 * e} ${e})`);
+  });
+  flowerEls.forEach((o, j) => {
+    const g = clamp((el - (nL + j) * sm) / (um * 1.4)), e = ease(g);
+    if (g <= 0){ o.g.setAttribute("display", "none"); return; }
+    o.g.removeAttribute("display");
+    const sway = Math.sin(now / 1700 + j * 2.1) * 1.1 * e, s2 = ease(clamp((g - .45) / .55));
+    o.g.setAttribute("transform", `translate(${CX + o.a * .3} ${BASE}) rotate(${o.a + sway})`);
+    o.st.setAttribute("transform", `scale(1 ${e})`);
+    o.sp.setAttribute("transform", `translate(0 ${-o.L * e}) scale(${.15 + .85 * s2} ${s2})`);
+  });
+  const N = nL + nF, full = (N - 1) * sm + um * (nF ? 1.4 : 1), pct = clamp(el / full) * 100, done = el >= full;
+  const step = Math.min(N - 1, Math.floor(el / sm));
+  if (prevStep !== null && step > prevStep && S.running) sparks(18);
+  prevStep = step;
+  if (pendingSparks){ sparks(pendingSparks); pendingSparks = 0; }
+  const txt = done ? cfg.doneText : (!S.running && el === 0) ? "Ждём старта" : cfg.infoLabel + ": " + Math.floor(pct) + "%" + (!S.running ? " · пауза" : "");
+  if (txt !== lastTxt){ $("info").textContent = txt; lastTxt = txt; }
+  requestAnimationFrame(frame);
+}
+setInterval(() => sparks(1), 900);
+
+/* Команды с пульта (старт, пауза, сброс, +1 шаг). Время считаем по часам сервера ntfy */
+function fold(m){
+  let c; try { c = JSON.parse(m.message); } catch(_){ return; }
+  if (seen.has(m.id)) return; seen.add(m.id);
+  localStorage.setItem("pl_seen", JSON.stringify([...seen].slice(-60)));
+  const t = m.time * 1000;
+  if (c.type === "start") S = {base:0, running:true, since:t};
+  else if (c.type === "pause"){ if (S.running){ S.base += t - S.since; S.running = false; } }
+  else if (c.type === "resume"){ if (!S.running){ S.running = true; S.since = t; } }
+  else if (c.type === "reset") S = {base:0, running:false, since:0};
+  else if (c.type === "skip") S.base += c.ms || 0;
+  else if (c.type === "full"){ S = {base:1e12, running:false, since:0}; if (Date.now() - t < 8000) pendingSparks = 40; }
+  localStorage.setItem("pl_state", JSON.stringify(S));
+}
+function sub(topic, fn){
+  const es = new EventSource("https://ntfy.sh/" + encodeURIComponent(topic) + "/sse?since=12h");
+  es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === "message") fn(m); } catch(_){} };
+}
+apply(cfg);
+setTimeout(() => apply(cfg), 200);
+requestAnimationFrame(frame);
+if (T){
+  sub(T + "-pl", m => { try { apply(JSON.parse(m.message)); } catch(_){} });
+  sub(T + "-plc", fold);
+}
+</script>
+</body>
+</html>
