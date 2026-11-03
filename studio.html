@@ -55,7 +55,7 @@ button.main{background:linear-gradient(90deg,#8a6b3a,#b79255);color:#14110a;widt
 <label>Подпись под названием</label><input type="text" data-w="L" data-k="subtitle">
 <label>Текст под числом</label><input type="text" data-w="L" data-k="label">
 <label>Название цели</label><input type="text" data-w="L" data-k="goalTitle">
-<label>Вид полосы цели</label><select data-w="L" data-k="barStyle"><option value="classic">Как раньше (с украшением)</option><option value="strip">Тонкая полоска с делениями</option></select>
+<label>Вид полосы цели</label><select data-w="L" data-k="barStyle"><option value="classic">Как раньше (с украшением)</option><option value="strip">Тонкая полоска с делениями</option><option value="bar">Прогресс-бар (проценты внутри)</option><option value="ring">Круговой (сердечко в центре)</option></select>
 <label>Размер шрифта виджета лайков (основное число, px)</label><select data-w="L" data-k="fontSize">
   <option value="48">Очень маленький — 48</option>
   <option value="56">Маленький — 56</option>
@@ -66,6 +66,30 @@ button.main{background:linear-gradient(90deg,#8a6b3a,#b79255);color:#14110a;widt
   <option value="96">Максимальный — 96</option>
 </select>
 <p class="hint">Размер меняет пропорционально основной счётчик и остальные текстовые элементы виджета лайков.</p>
+<label>Анимация полосы или кольца</label>
+<select data-w="L" data-k="barAnim"><option value="shine">Блик</option><option value="stripes">Бегущие полосы</option><option value="pulse">Мягкое свечение</option><option value="none">Без анимации</option></select>
+<div class="row">
+  <div><label>Цвет заполнения, начало</label><input type="color" data-w="L" data-k="fill1"></div>
+  <div><label>Цвет заполнения, конец</label><input type="color" data-w="L" data-k="fill2"></div>
+</div>
+<div class="row">
+  <div><label>Толщина прогресс-бара, px (20-56)</label><input type="number" min="20" max="56" data-w="L" data-k="barHeight"></div>
+  <div><label>Диаметр кольца, px (160-340)</label><input type="number" min="160" max="340" data-w="L" data-k="ringSize"></div>
+</div>
+<div class="row">
+  <div><label>Толщина кольца (6-20)</label><input type="number" min="6" max="20" data-w="L" data-k="ringThick"></div>
+  <div><label>Что писать под сердечком</label><select data-w="L" data-k="ringText">
+    <option value="likes_sub">Налайкано, снизу «осталось N»</option>
+    <option value="likes_remain">Налайкано / осталось</option>
+    <option value="likes_goal">Налайкано / цель</option>
+    <option value="likes">Только налайкано</option>
+    <option value="remain">Только осталось</option>
+  </select></div>
+</div>
+<label class="chk"><input type="checkbox" data-w="L" data-k="ringTicks"> Деления вокруг кольца</label>
+<label class="chk"><input type="checkbox" data-w="L" data-k="customText"> Свой цвет цифр (вместо латунного)</label>
+<div class="row"><div><label>Цвет цифр</label><input type="color" data-w="L" data-k="textColor"></div></div>
+<p class="hint">Толщина, диаметр и подписи кольца работают только для вида «Круговой», толщина бара только для «Прогресс-бара». Анимации применяются к бару и кольцу.</p>
 <div class="row">
   <div><label>Цель (лайков)</label><input type="number" data-w="L" data-k="target"></div>
   <div><label>Следующая цель на +</label><input type="number" data-w="L" data-k="step"></div>
@@ -186,7 +210,8 @@ Galaxy=20"></textarea>
 <script>
 const D = {
   L:{title:"OVSYANKA", subtitle:"Team", label:"лайков на эфире", goalTitle:"Цель", target:10000, step:5000, autoNext:true,
-     celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", fontSize:72, gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0},
+     celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", fontSize:72, gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0,
+     barAnim:"shine", fill1:"#55663a", fill2:"#b79255", barHeight:34, ringSize:240, ringThick:12, ringText:"likes_sub", ringTicks:true, customText:false, textColor:"#efe6d2"},
   S:{title:"OVSYANKA", subtitle:"Team", mode:"list", seconds:4, fontSize:30, showFor:20, hideFor:10, gold:"#b79255", moss:"#6b7a3f", visible:true,
      itemsText:"tiktok @ovsyanka.team\ninstagram @ovsyanka.team\ntelegram @ovsyanka_team"}
 };

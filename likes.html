@@ -58,6 +58,46 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-famil
 .goal.strip .bar::after{content:"";position:absolute;inset:-5px 0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),color-mix(in srgb,var(--gold) 60%,transparent) calc(10% - 1px) 10%)}
 .goal.strip .fill{background:linear-gradient(90deg,var(--moss),var(--gold));box-shadow:0 0 8px color-mix(in srgb,var(--gold) 50%,transparent)}
 .goal.strip .tip{width:12px;height:12px;right:-6px;top:-3px;border-radius:2px;background:#efe6d2;box-shadow:0 0 8px rgba(183,146,85,.6);transform:rotate(45deg);animation:none}
+.solid{background:none!important;-webkit-text-fill-color:var(--num-color)!important;color:var(--num-color)!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+.bpct{display:none}
+.goal.bar2 .bar{height:var(--bar-h,34px);padding:3px;border-radius:99px;background:rgba(0,0,0,.42);border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);overflow:hidden}
+.goal.bar2 .fill{border-radius:99px;overflow:hidden;background:linear-gradient(90deg,var(--fill1,#55663a),var(--fill2,#b79255));box-shadow:inset 0 1px 0 rgba(255,244,214,.28)}
+.goal.bar2 .tip{display:none}
+.goal.bar2 .bpct{display:grid;place-items:center;position:absolute;inset:0;z-index:2;font-family:'Jost','Segoe UI',sans-serif;font-weight:500;letter-spacing:.14em;font-size:calc(var(--bar-h,34px) * .4);color:#efe6d2;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.65);pointer-events:none}
+.goal.bar2[data-anim=shine] .fill::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,244,214,.5) 50%,transparent 65%);transform:translateX(-100%);animation:bsh 2.8s ease-in-out infinite}
+@keyframes bsh{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+.goal.bar2[data-anim=stripes] .fill::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,244,214,.2) 0 10px,transparent 10px 20px);animation:bst 1s linear infinite}
+@keyframes bst{to{background-position:20px 0}}
+.goal.bar2[data-anim=pulse] .fill{animation:bpu 2.2s ease-in-out infinite}
+@keyframes bpu{50%{filter:brightness(1.28) saturate(1.1)}}
+.rgbox{display:none;flex-direction:column;align-items:center;width:100%;margin-top:14px}
+.card.ring-mode{display:flex;flex-direction:column;align-items:center}
+.card.ring-mode .count,.card.ring-mode .lbl,.card.ring-mode .goal{display:none}
+.card.ring-mode .rgbox{display:flex}
+.rgwrap{position:relative;width:var(--rg-size,240px);height:var(--rg-size,240px)}
+.rgsvg{width:100%;height:100%;overflow:visible;transform:rotate(-90deg)}
+.rgtrack{fill:none;stroke:rgba(0,0,0,.42)}
+.rghair{fill:none;stroke:color-mix(in srgb,var(--gold) 50%,transparent);stroke-width:1}
+.rgticks line{stroke:color-mix(in srgb,var(--gold) 55%,transparent);stroke-width:1.2}
+.rgfill{fill:none;stroke:url(#rgg);stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.2,1,.3,1)}
+.rgstripes{fill:none;stroke:rgba(255,244,214,.38);stroke-dasharray:3 9;display:none}
+.rgtip{transform-origin:100px 100px;transition:transform 1.6s cubic-bezier(.2,1,.3,1)}
+.rgtip circle{fill:#efe6d2;filter:drop-shadow(0 0 5px rgba(241,223,180,.75))}
+.rgwrap[data-anim=stripes] .rgstripes{display:block;animation:rgdash 1.2s linear infinite}
+@keyframes rgdash{to{stroke-dashoffset:-24}}
+.rgwrap[data-anim=shine] .rgtip circle{animation:rgtp 1.8s ease-in-out infinite}
+@keyframes rgtp{50%{filter:drop-shadow(0 0 11px rgba(255,238,200,1))}}
+.rgwrap[data-anim=pulse] .rgfill{animation:rgglow 2.4s ease-in-out infinite}
+@keyframes rgglow{0%,100%{filter:drop-shadow(0 0 2px color-mix(in srgb,var(--fill2,#b79255) 40%,transparent))}50%{filter:drop-shadow(0 0 10px color-mix(in srgb,var(--fill2,#b79255) 85%,transparent))}}
+.rgwrap[data-anim=pulse] .rgheart{animation:rghb 2.2s ease-in-out infinite}
+@keyframes rghb{50%{transform:scale(1.14)}}
+.rgc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12%}
+.rgheart{width:var(--rg-heart,38px);height:var(--rg-heart,38px);filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.rgheart.beat{animation:beat .5s}
+.rgn{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:var(--rg-num,46px);line-height:1.05;margin-top:4px;white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.rgs{font-style:italic;font-size:var(--rg-sub,18px);color:#d9ccae;white-space:nowrap}
+.rgcap{font-style:italic;font-size:var(--rg-cap,21px);opacity:.88;margin-top:10px}
+.rggoal{font-size:var(--rg-cap,21px);font-weight:600;color:#e6dabc;margin-top:2px}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(90% 70% at 85% 0%,rgba(255,236,196,.07),transparent 60%)}
 </style>
@@ -73,7 +113,30 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;ba
    <div class="num metal" id="num">0</div>
   </div>
   <div class="lbl" id="lbl"></div>
-  <div class="goal" id="goal"><div class="gt"><span id="gname"></span><span id="gnum"></span></div><div class="bar"><div class="fill" id="fill"><i class="tip"></i></div></div></div>
+  <div class="goal" id="goal"><div class="gt"><span id="gname"></span><span id="gnum"></span></div><div class="bar"><div class="fill" id="fill"><i class="tip"></i></div><span class="bpct" id="bpct"></span></div></div>
+  <div class="rgbox" id="rgbox">
+   <div class="rgwrap" id="rgwrap" data-anim="shine">
+    <svg class="rgsvg" viewBox="0 0 200 200">
+     <defs>
+      <linearGradient id="rgg" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="200" y2="0"><stop offset="0" style="stop-color:var(--fill1,#55663a)"/><stop offset="1" style="stop-color:var(--fill2,#b79255)"/></linearGradient>
+      <mask id="rgm"><circle id="rgmask" cx="100" cy="100" r="80" fill="none" stroke="#fff" stroke-linecap="round"/></mask>
+     </defs>
+     <circle class="rgtrack" id="rgtrack" cx="100" cy="100" r="80"/>
+     <circle class="rghair" id="rghair" cx="100" cy="100" r="90"/>
+     <g class="rgticks" id="rgticks"></g>
+     <circle class="rgfill" id="rgfill" cx="100" cy="100" r="80"/>
+     <circle class="rgstripes" id="rgstripes" cx="100" cy="100" r="80" mask="url(#rgm)"/>
+     <g class="rgtip" id="rgtip"><circle cx="180" cy="100" r="7"/></g>
+    </svg>
+    <div class="rgc">
+     <svg class="rgheart" id="rgheart" viewBox="0 0 24 24"><defs><linearGradient id="hg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8dcc0"/><stop offset="1" stop-color="#a88a52"/></linearGradient></defs><path fill="url(#hg2)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+     <div class="rgn metal" id="rgn"></div>
+     <div class="rgs" id="rgs"></div>
+    </div>
+   </div>
+   <div class="rgcap" id="rgcap"></div>
+   <div class="rggoal" id="rggoal"></div>
+  </div>
   <div class="cele" id="cele"><div class="ring"></div><div class="ring r2"></div><div class="c1 metal" id="c1"></div><div class="c2" id="c2"></div><div class="c3" id="c3"></div></div>
  </div></div></div>
 </div>
@@ -84,7 +147,8 @@ document.querySelectorAll('.spray').forEach(e => e.innerHTML = SPRAY);
 const $ = id => document.getElementById(id);
 const T = new URLSearchParams(location.search).get("t");
 const DEF = {title:"OVSYANKA", subtitle:"Team", label:"лайков на эфире", goalTitle:"Цель", target:10000, step:5000, autoNext:true,
-  celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", fontSize:72, gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0};
+  celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", fontSize:72, gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0,
+  barAnim:"shine", fill1:"#55663a", fill2:"#b79255", barHeight:34, ringSize:240, ringThick:12, ringText:"likes_sub", ringTicks:true, customText:false, textColor:"#efe6d2"};
 let cfg = Object.assign({}, DEF, JSON.parse(localStorage.getItem("tw_lk_cfg") || "{}"));
 let total = +localStorage.getItem("tw_lk_total") || 0, shown = 0, lastLevel = 0, lastTest = 0, ready = false, ct;
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
@@ -95,17 +159,67 @@ function lv(){
   return { level, eff: auto ? tg + level * cfg.step : tg, prev: auto && level > 0 ? tg + (level - 1) * cfg.step : 0,
            reached: level > 0 ? (auto ? tg + (level - 1) * cfg.step : tg) : 0 };
 }
+const RC = 2 * Math.PI * 80;
+function buildTicks(){
+  let h = "";
+  for (let i = 0; i < 60; i++){
+    const a = i * 6 * Math.PI / 180, long = i % 5 === 0, r1 = long ? 95 : 96.5, r2 = 99;
+    h += `<line x1="${(100 + r1 * Math.cos(a)).toFixed(2)}" y1="${(100 + r1 * Math.sin(a)).toFixed(2)}" x2="${(100 + r2 * Math.cos(a)).toFixed(2)}" y2="${(100 + r2 * Math.sin(a)).toFixed(2)}"/>`;
+  }
+  $("rgticks").innerHTML = h;
+  ["rgfill", "rgmask"].forEach(id => { $(id).setAttribute("stroke-dasharray", RC); $(id).style.strokeDashoffset = RC; });
+}
+function sizes(){
+  const r = document.documentElement.style, scale = Math.min(96, Math.max(48, Number(cfg.fontSize) || 72)) / 72;
+  const rs = Math.min(340, Math.max(160, Number(cfg.ringSize) || 240)), th = Math.min(20, Math.max(6, Number(cfg.ringThick) || 12));
+  const slash = cfg.ringText === "likes_goal" || cfg.ringText === "likes_remain";
+  r.setProperty("--rg-size", rs + "px");
+  r.setProperty("--rg-num", (rs * (slash ? .1 : .19) * scale).toFixed(1) + "px");
+  r.setProperty("--rg-sub", (rs * (slash ? .062 : .075) * scale).toFixed(1) + "px");
+  r.setProperty("--rg-heart", (rs * .16).toFixed(1) + "px");
+  r.setProperty("--rg-cap", (21 * scale).toFixed(1) + "px");
+  r.setProperty("--bar-h", Math.min(56, Math.max(20, Number(cfg.barHeight) || 34)) + "px");
+  r.setProperty("--fill1", cfg.fill1); r.setProperty("--fill2", cfg.fill2); r.setProperty("--num-color", cfg.textColor);
+  ["rgtrack", "rgfill", "rgmask"].forEach(id => $(id).setAttribute("stroke-width", th));
+  $("rgstripes").setAttribute("stroke-width", Math.max(2, th - 3));
+  $("rghair").setAttribute("r", 80 + th / 2 + 4);
+  $("rgtip").querySelector("circle").setAttribute("r", Math.max(4, th * .6));
+  $("rgticks").style.display = cfg.ringTicks ? "" : "none";
+  $("rgwrap").dataset.anim = cfg.barAnim; $("goal").dataset.anim = cfg.barAnim;
+  $("num").classList.toggle("solid", !!cfg.customText); $("rgn").classList.toggle("solid", !!cfg.customText);
+  $("goal").classList.toggle("bar2", cfg.barStyle === "bar");
+  $("card").classList.toggle("ring-mode", cfg.barStyle === "ring");
+}
+function updRing(){
+  const L = lv(), rem = Math.max(0, L.eff - shown);
+  let main, sub = "";
+  switch (cfg.ringText){
+    case "likes_goal": main = fmt(shown) + " / " + fmt(L.eff); sub = "налайкано / цель"; break;
+    case "likes_remain": main = fmt(shown) + " / " + fmt(rem); sub = "налайкано / " + cfg.remainText; break;
+    case "likes": main = fmt(shown); break;
+    case "remain": main = fmt(rem); sub = cfg.remainText; break;
+    default: main = fmt(shown); sub = cfg.remainText + " " + fmt(rem);
+  }
+  $("rgn").textContent = main; $("rgs").textContent = sub; $("rgs").style.display = sub ? "" : "none";
+}
 function render(){
   const L = lv();
   $("gname").textContent = cfg.goalTitle + ": " + fmt(L.eff);
   const pct = Math.max(0, Math.min(100, (total - L.prev) / ((L.eff - L.prev) || 1) * 100));
   $("gnum").textContent = cfg.remainText + " " + fmt(Math.max(0, L.eff - total)) + " ♥";
   $("fill").style.width = pct + "%";
+  $("bpct").textContent = Math.floor(pct) + "%";
+  const off = RC * (1 - pct / 100);
+  ["rgfill", "rgmask"].forEach(id => $(id).style.strokeDashoffset = off);
+  $("rgtip").style.transform = `rotate(${pct * 3.6}deg)`;
+  $("rggoal").textContent = cfg.goalTitle + ": " + fmt(L.eff) + " · " + Math.floor(pct) + "%";
+  $("rgcap").textContent = cfg.label;
+  updRing();
   if (L.level > lastLevel){ const r = L.reached; if (ready) setTimeout(() => celebrate(r), 1200); lastLevel = L.level; }
   else if (L.level < lastLevel) lastLevel = L.level;
 }
 function setLikes(n){
-  if (n > total){ const h = $("heart"); h.classList.remove("beat"); void h.getBoundingClientRect(); h.classList.add("beat"); }
+  if (n > total){ ["heart", "rgheart"].forEach(id => { const h = $(id); h.classList.remove("beat"); void h.getBoundingClientRect(); h.classList.add("beat"); }); }
   total = n; localStorage.setItem("tw_lk_total", n); render();
 }
 function celebrate(goal){
@@ -138,12 +252,13 @@ function apply(c){
   $("title").textContent = cfg.title; $("subt").textContent = cfg.subtitle; $("lbl").textContent = cfg.label;
   $("pop").classList.toggle("hide", !cfg.visible);
   $("goal").classList.toggle("strip", cfg.barStyle === "strip");
+  sizes();
   if (cfg.test && cfg.test !== lastTest){ lastTest = cfg.test; if (ready) celebrate(lv().reached || cfg.target); }
   render();
 }
 (function loop(){
   const d = total - shown;
-  if (d){ const s = Math.max(1, Math.ceil(Math.abs(d) * .08)); shown += Math.sign(d) * Math.min(s, Math.abs(d)); $("num").textContent = fmt(shown); }
+  if (d){ const s = Math.max(1, Math.ceil(Math.abs(d) * .08)); shown += Math.sign(d) * Math.min(s, Math.abs(d)); $("num").textContent = fmt(shown); updRing(); }
   requestAnimationFrame(loop);
 })();
 setInterval(() => {
@@ -152,6 +267,7 @@ setInterval(() => {
   m.style.cssText = `left:${6+Math.random()*88}%;width:${z}px;height:${z}px;--dx:${(Math.random()-.5)*60}px;animation-duration:${4+Math.random()*3}s`;
   $("card").appendChild(m); setTimeout(() => m.remove(), 7500);
 }, 550);
+buildTicks();
 setTimeout(() => apply(cfg), 200);
 
 /* Прямое подключение к TikFinity (если запущен на этом же ПК) */
