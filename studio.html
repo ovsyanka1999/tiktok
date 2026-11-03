@@ -56,6 +56,16 @@ button.main{background:linear-gradient(90deg,#8a6b3a,#b79255);color:#14110a;widt
 <label>Текст под числом</label><input type="text" data-w="L" data-k="label">
 <label>Название цели</label><input type="text" data-w="L" data-k="goalTitle">
 <label>Вид полосы цели</label><select data-w="L" data-k="barStyle"><option value="classic">Как раньше (с украшением)</option><option value="strip">Тонкая полоска с делениями</option></select>
+<label>Размер шрифта виджета лайков (основное число, px)</label><select data-w="L" data-k="fontSize">
+  <option value="48">Очень маленький — 48</option>
+  <option value="56">Маленький — 56</option>
+  <option value="64">Небольшой — 64</option>
+  <option value="72">Стандартный — 72</option>
+  <option value="80">Крупный — 80</option>
+  <option value="88">Очень крупный — 88</option>
+  <option value="96">Максимальный — 96</option>
+</select>
+<p class="hint">Размер меняет пропорционально основной счётчик и остальные текстовые элементы виджета лайков.</p>
 <div class="row">
   <div><label>Цель (лайков)</label><input type="number" data-w="L" data-k="target"></div>
   <div><label>Следующая цель на +</label><input type="number" data-w="L" data-k="step"></div>
@@ -86,6 +96,19 @@ button.main{background:linear-gradient(90deg,#8a6b3a,#b79255);color:#14110a;widt
   <div><label>Показ</label><select data-w="S" data-k="mode"><option value="list">Все сразу списком</option><option value="rotate">По одной по кругу</option></select></div>
   <div><label>Секунд на одну</label><input type="number" data-w="S" data-k="seconds"></div>
 </div>
+<div class="row">
+  <div><label>Размер шрифта соцсетей (px)</label><select data-w="S" data-k="fontSize">
+    <option value="16">Очень маленький — 16</option>
+    <option value="20">Маленький — 20</option>
+    <option value="24">Небольшой — 24</option>
+    <option value="28">Средний — 28</option>
+    <option value="30">Стандартный — 30</option>
+    <option value="34">Крупный — 34</option>
+    <option value="38">Очень крупный — 38</option>
+    <option value="42">Максимальный — 42</option>
+  </select></div>
+</div>
+<p class="hint">Размер применяется к никам и ссылкам в строках соцсетей. Если текст длинный, он будет обрезан по ширине виджета.</p>
 <div class="row">
   <div><label>Показывать, сек. (0 = всегда)</label><input type="number" data-w="S" data-k="showFor"></div>
   <div><label>Пауза до появления, сек.</label><input type="number" data-w="S" data-k="hideFor"></div>
@@ -163,8 +186,8 @@ Galaxy=20"></textarea>
 <script>
 const D = {
   L:{title:"OVSYANKA", subtitle:"Team", label:"лайков на эфире", goalTitle:"Цель", target:10000, step:5000, autoNext:true,
-     celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0},
-  S:{title:"OVSYANKA", subtitle:"Team", mode:"list", seconds:4, showFor:20, hideFor:10, gold:"#b79255", moss:"#6b7a3f", visible:true,
+     celeTitle:"Цель достигнута!", celeSub:"Спасибо за каждый лайк", remainText:"осталось", barStyle:"classic", fontSize:72, gold:"#b79255", moss:"#6b7a3f", visible:true, direct:true, test:0},
+  S:{title:"OVSYANKA", subtitle:"Team", mode:"list", seconds:4, fontSize:30, showFor:20, hideFor:10, gold:"#b79255", moss:"#6b7a3f", visible:true,
      itemsText:"tiktok @ovsyanka.team\ninstagram @ovsyanka.team\ntelegram @ovsyanka_team"}
 };
 D.P = {title:"Спатифиллум", subtitle:"Sensation", infoLabel:"Растём", doneText:"Расцвело ✿", leaves:9, flowers:3,

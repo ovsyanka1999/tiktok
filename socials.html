@@ -41,7 +41,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-famil
 .row.out{opacity:0;transform:translateY(-14px)}
 .ic{flex:none;width:46px;height:46px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:rgba(0,0,0,.25);box-shadow:inset 0 0 12px color-mix(in srgb,var(--gold) 18%,transparent)}
 .ic svg{width:24px;height:24px;fill:none;stroke:color-mix(in srgb,var(--gold) 45%,#f3ead3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.h{font-size:30px;font-weight:600;color:#efe6d2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px}
+.h{font-size:var(--social-font-size,30px);font-weight:600;color:#efe6d2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px}
 .mote{position:absolute;bottom:14px;border-radius:50%;background:#f1dfb4;box-shadow:0 0 5px rgba(241,223,180,.55);pointer-events:none;animation:mote linear forwards}
 @keyframes mote{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),-230px)}}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
@@ -79,7 +79,7 @@ let cfg = Object.assign({}, DEF, JSON.parse(localStorage.getItem("tw_so_cfg") ||
 let sig = "", rows = [], idx = 0, timer;
 
 function build(){
-  const s = JSON.stringify([cfg.items, cfg.mode, cfg.seconds]); if (s === sig) return; sig = s;
+  const s = JSON.stringify([cfg.items, cfg.mode, cfg.seconds, cfg.fontSize]); if (s === sig) return; sig = s;
   clearInterval(timer); const L = $("list"); L.innerHTML = ""; idx = 0;
   L.className = "list" + (cfg.mode === "rotate" ? " rot" : "");
   rows = cfg.items.map(it => {
@@ -117,7 +117,7 @@ function schedule(){
 }
 function apply(c){
   cfg = Object.assign({}, DEF, c); localStorage.setItem("tw_so_cfg", JSON.stringify(cfg));
-  const r = document.documentElement.style; r.setProperty("--gold", cfg.gold); r.setProperty("--moss", cfg.moss);
+  const r = document.documentElement.style; r.setProperty("--gold", cfg.gold); r.setProperty("--moss", cfg.moss); r.setProperty("--social-font-size", `${Math.min(48, Math.max(12, Number(cfg.fontSize) || 30))}px`);
   $("title").textContent = cfg.title; $("subt").textContent = cfg.subtitle;
   build(); $("pop").classList.toggle("hide", !cfg.visible); schedule();
 }
